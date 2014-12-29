@@ -1,0 +1,88 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Algorithm::Burg - extrapolate time series using Burg's method
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+The L<Algorithm::Burg> module uses the Burg method to fit an autoregressive (AR)
+model to the input data by minimizing (least squares) the forward and backward
+prediction errors while constraining the AR parameters to satisfy the
+Levinson-Durbin recursion.
+
+=head1 ATTRIBUTES
+
+=head2 coefficients
+
+AR model polynomial coefficients computed by the C<train> method.
+
+=head2 order
+
+AR model order
+
+=head1 METHODS
+
+=head2 train($time_series)
+
+Computes vector of coefficients using Burg algorithm applied to the input
+source data C<$time_series>.
+
+=for test_synopsis my (@time_series);
+
+    #!/usr/bin/env perl;
+    use strict;
+    use warnings qw(all);
+    use Algorithm::Burg;
+    ...;
+    my $burg = Algorithm::Burg->new(order => 150);
+    $burg->train(\@time_series);
+
+=head1 REFERENCES
+
+=over 4
+
+=item *
+
+L<Burg's Method, Algorithm and Recursion|http://www.emptyloop.com/technotes/A%20tutorial%20on%20Burg's%20method,%20algorithm%20and%20recursion.pdf>
+
+=item *
+
+L<C++ implementation|https://github.com/RhysU/ar/blob/master/collomb2009.cpp>
+
+=item *
+
+L<Matlab/Octave implementation|https://gist.github.com/tobin/2843661>
+
+=item *
+
+L<Python implementation|https://github.com/MrKriss/Old-PhD-Code/blob/master/Algorithms/burg_AR.py>
+
+=back
+
+=head1 AUTHOR
+
+Stanislaw Pusep <stas@sysd.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Stanislaw Pusep.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Stanislaw Pusep
+
+Stanislaw Pusep <creaktive@gmail.com>
+
+=cut

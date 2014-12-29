@@ -3,21 +3,30 @@ package Algorithm::Burg;
 
 =head1 SYNOPSIS
 
+=for test_synopsis
+    my (@time_series);
+
     #!/usr/bin/env perl;
     use strict;
     use warnings qw(all);
     use Algorithm::Burg;
-    ...
+    ...;
+    my $burg = Algorithm::Burg->new(order => 150);
+    $burg->train(\@time_series);
 
 =head1 DESCRIPTION
 
-...
+The L<Algorithm::Burg> module uses the Burg method to fit an autoregressive (AR)
+model to the input data by minimizing (least squares) the forward and backward
+prediction errors while constraining the AR parameters to satisfy the
+Levinson-Durbin recursion.
 
 =cut
 
 use strict;
 use warnings qw(all);
 
+use Carp qw(croak);
 use List::Util qw(sum);
 
 use Moo;
@@ -33,15 +42,15 @@ use MooX::Types::MooseLike::Numeric qw(
 
 =attr coefficients
 
-...
+AR model polynomial coefficients computed by the C<train> method.
 
 =cut
 
-has coefficients    => (is => 'rw', isa => ArrayRef[Num]);
+has coefficients    => (is => 'rwp', isa => ArrayRef[Num]);
 
 =attr order
 
-...
+AR model order
 
 =cut
 
@@ -49,34 +58,41 @@ has order           => (is => 'ro', isa => PositiveInt, required => 1);
 
 =method train($time_series)
 
-...
+Computes vector of coefficients using Burg algorithm applied to the input
+source data C<$time_series>.
 
 =cut
 
 sub train {
     my ($self, $time_series) = @_;
 
+    croak '$time_series should be an ArrayRef'
+        if ref($time_series) ne 'ARRAY';
+
     my $m = $self->order;
     my @x = @$time_series;
+
+    croak '$time_series should have more elements than the AR order is'
+        if $#x < $m;
 
     # initialize Ak
     my @Ak = (1.0, (0.0) x $m);
 
     # initialize f and b
     my @f = @$time_series;
-    my @b = @$time_series;
+    my @B = @$time_series;
 
     # Initialize Dk
     my $Dk = sum map {
         2.0 * $f[$_] ** 2
     } 0 .. $#f;
-    $Dk -= $f[0] ** 2 + $b[$#x] ** 2;
+    $Dk -= $f[0] ** 2 + $B[$#x] ** 2;
 
     # Burg recursion
     for my $k (0 .. $m - 1) {
         # compute mu
         my $mu = sum map {
-            $f[$_ + $k + 1] * $b[$_]
+            $f[$_ + $k + 1] * $B[$_]
         } 0 .. $#x - $k - 1;
         $mu *= -2.0 / $Dk;
 
@@ -90,19 +106,19 @@ sub train {
 
         # update f and b
         for my $n (0 .. $#x - $k - 1) {
-            my $t1 = $f[$n + $k + 1] + $mu * $b[$n];
-            my $t2 = $b[$n] + $mu * $f[$n + $k + 1];
+            my $t1 = $f[$n + $k + 1] + $mu * $B[$n];
+            my $t2 = $B[$n] + $mu * $f[$n + $k + 1];
             $f[$n + $k + 1] = $t1;
-            $b[$n] = $t2;
+            $B[$n] = $t2;
         }
 
         # update Dk
         $Dk = (1.0 - $mu ** 2) * $Dk
             - $f[$k + 1] ** 2
-            - $b[$#x - $k - 1] ** 2;
+            - $B[$#x - $k - 1] ** 2;
     }
 
-    $self->coefficients([ @Ak[1 .. $#Ak] ]);
+    return $self->_set_coefficients([ @Ak[1 .. $#Ak] ]);
 }
 
 =head1 REFERENCES
