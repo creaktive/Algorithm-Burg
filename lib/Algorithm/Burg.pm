@@ -22,6 +22,8 @@ model to the input data by minimizing (least squares) the forward and backward
 prediction errors while constraining the AR parameters to satisfy the
 Levinson-Durbin recursion.
 
+B<DISCLAIMER: This is work in progress! The code is buggy and the interface is subject to change.>
+
 =cut
 
 use strict;
