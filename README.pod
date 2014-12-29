@@ -31,7 +31,7 @@ AR model order
 
 =head2 series_tail
 
-...
+Store the last L</order> terms of the time series for L</predict($n)>.
 
 =head1 METHODS
 
@@ -54,6 +54,7 @@ L</order>, assume C<$n> = L</order>.
     ...;
     my $burg = Algorithm::Burg->new(order => 150);
     $burg->train(\@time_series);
+    my $result = $burg->predict();
 
 =head1 REFERENCES
 

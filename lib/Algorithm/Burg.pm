@@ -13,6 +13,7 @@ package Algorithm::Burg;
     ...;
     my $burg = Algorithm::Burg->new(order => 150);
     $burg->train(\@time_series);
+    my $result = $burg->predict();
 
 =head1 DESCRIPTION
 
@@ -58,7 +59,7 @@ has order           => (is => 'ro', isa => PositiveInt, required => 1);
 
 =attr series_tail
 
-...
+Store the last L</order> terms of the time series for L</predict($n)>.
 
 =cut
 
