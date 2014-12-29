@@ -29,12 +29,21 @@ AR model polynomial coefficients computed by the C<train> method.
 
 AR model order
 
+=head2 series_tail
+
+...
+
 =head1 METHODS
 
 =head2 train($time_series)
 
 Computes vector of coefficients using Burg algorithm applied to the input
 source data C<$time_series>.
+
+=head2 predict($n)
+
+Predict C<$n> next values for the time series. If C<$n> is 0 or bigger than
+L</order>, assume C<$n> = L</order>.
 
 =for test_synopsis my (@time_series);
 
@@ -78,11 +87,5 @@ This software is copyright (c) 2014 by Stanislaw Pusep.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-=head1 CONTRIBUTOR
-
-=for stopwords Stanislaw Pusep
-
-Stanislaw Pusep <creaktive@gmail.com>
 
 =cut

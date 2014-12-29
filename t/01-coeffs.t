@@ -32,4 +32,4 @@ for my $i (0 .. $#coeff1) {
     $error += $delta * $delta;
 }
 
-ok($error < $epsilon, 'error < epsilon');
+ok($error < $epsilon, "error < epsilon ($error)");

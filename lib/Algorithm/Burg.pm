@@ -56,6 +56,14 @@ AR model order
 
 has order           => (is => 'ro', isa => PositiveInt, required => 1);
 
+=attr series_tail
+
+...
+
+=cut
+
+has series_tail     => (is => 'rwp', isa => ArrayRef[Num]);
+
 =method train($time_series)
 
 Computes vector of coefficients using Burg algorithm applied to the input
@@ -118,7 +126,33 @@ sub train {
             - $B[$#x - $k - 1] ** 2;
     }
 
+    $self->_set_series_tail([ @x[$#x - $m .. $#x] ]);
     return $self->_set_coefficients([ @Ak[1 .. $#Ak] ]);
+}
+
+=method predict($n)
+
+Predict C<$n> next values for the time series. If C<$n> is 0 or bigger than
+L</order>, assume C<$n> = L</order>.
+
+=cut
+
+sub predict {
+    my ($self, $n) = @_;
+
+    my $coeffs = $self->coefficients;
+    my $m = $self->order;
+    $n ||= $m
+        if !$n || $n > $m;
+
+    my @predicted = @{ $self->series_tail };
+    for my $i ($m .. $m + $n) {
+        $predicted[$i] = -1.0 * sum map {
+            $coeffs->[$_] * $predicted[$i - 1 - $_]
+        } 0 .. $m - 1;
+    }
+
+    return [ @predicted[$m .. $#predicted] ];
 }
 
 =head1 REFERENCES
